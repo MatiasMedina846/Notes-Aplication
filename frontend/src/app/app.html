@@ -1,0 +1,62 @@
+<div class="app-container">
+  <aside class="sidebar">
+    <h2>Ensolvers Notes</h2>
+    <div class="nav-section">
+      <button [class.active]="!showArchived" (click)="switchView(false)">Notas Activas</button>
+      <button [class.active]="showArchived" (click)="switchView(true)">Archivadas</button>
+    </div>
+
+
+    <div class="tags-section">
+      <h3>Etiquetas</h3>
+      <ul class="tag-list">
+        <li [class.selected]="selectedTagId === null" (click)="filterByTag(null)">Todos</li>
+        <li *ngFor="let tag of tags" [class.selected]="selectedTagId === tag.id" (click)="filterByTag(tag.id!)">
+          🏷️ {{ tag.name }} ({{ getTagCount(tag.id!) }})
+          <span class="delete-tag" (click)="removeTag($event, tag.id!)">×</span>
+        </li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <section class="form-card" *ngIf="isCreatingOrEditing">
+      <h3>{{ isEditing ? 'Editar nota' : 'Nueva nota' }}</h3>
+      <input type="text" [(ngModel)]="currentNote.title" placeholder="Título" />
+      <textarea [(ngModel)]="currentNote.content" placeholder="Escribe algo increíble..."></textarea>
+      <input type="text" [(ngModel)]="inputTags" placeholder="Etiquetas separadas por comas" />
+
+      <div class="form-actions">
+        <button (click)="resetForm()" class="btn-cancel">Cancelar</button>
+        <button (click)="saveNote()" class="btn-save">Guardar</button>
+      </div>
+    </section>
+
+    <section class="notes-grid" *ngIf="!isCreatingOrEditing && displayedNotes.length > 0">
+      <div class="note-card" *ngFor="let note of displayedNotes">
+        <h4>{{ note.title }}</h4>
+        <p>{{ note.content }}</p>
+        <div class="note-tags">
+          <span *ngFor="let t of note.tags" class="tag-pill">#{{ t.name }}</span>
+        </div>
+        <div class="note-actions">
+          <button (click)="editNote(note); $event.stopPropagation()">
+            <img src="https://cdn-icons-png.flaticon.com/24/1159/1159633.png" alt="Edit" width="18">
+          </button>
+          <button (click)="toggleArchive(note.id!); $event.stopPropagation()">
+            <img src="https://cdn-icons-png.flaticon.com/24/679/679821.png" alt="Archive" width="18">
+          </button>
+          <button class="delete" (click)="deleteNote(note.id!); $event.stopPropagation()">
+            <img src="https://cdn-icons-png.flaticon.com/24/3096/3096673.png" alt="Delete" width="18">
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div class="empty-state" *ngIf="!isCreatingOrEditing && displayedNotes.length === 0">
+      <p>No notes created</p>
+    </div>
+
+    <button class="btn-fab" *ngIf="!isCreatingOrEditing" (click)="isCreatingOrEditing = true">+</button>
+  </main>
+</div>
